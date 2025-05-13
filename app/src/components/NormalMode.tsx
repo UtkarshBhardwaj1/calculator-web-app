@@ -18,6 +18,7 @@ const NormalMode: React.FC<NormalModeProps> = ({
   handleClearClick,
   handleDecimalClick,
   handlePercentageClick,
+  
 }) => {
   return (
     <div className="normal-mode">
@@ -26,6 +27,7 @@ const NormalMode: React.FC<NormalModeProps> = ({
         <Button value="+/-" onClick={() => console.log('+/-')} />
         <Button value="%" onClick={() => handlePercentageClick()} />
         <Button value="/" onClick={handleOperatorClick} className="operator" />
+        
       </div>
       <div className="row">
         {['7', '8', '9'].map((num) => (

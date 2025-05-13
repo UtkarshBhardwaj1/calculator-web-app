@@ -1,61 +1,92 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { evaluate } from 'mathjs';
 
 const useCalculatorLogic = () => {
-  const [currentInput, setCurrentInput] = useState<string>('0');
-  const [previousInput, setPreviousInput] = useState<string | null>(null);
-  const [operator, setOperator] = useState<string | null>(null);
+  const [expression, setExpression] = useState<string>(''); // holds full expression
   const [result, setResult] = useState<string>('0');
 
   const handleNumberClick = (value: string) => {
-    setCurrentInput((prev) => (prev === '0' || prev === 'Error' ? value : prev + value));
+    setExpression((prev) => prev + value);
   };
 
   const handleOperatorClick = (value: string) => {
-    if (currentInput === 'Error') return;
-    if (previousInput !== null) {
-      handleEqualsClick();
-    }
-    setPreviousInput(currentInput);
-    setOperator(value);
-    setCurrentInput('0');
+    setExpression((prev) => prev + ' ' + value + ' ');
   };
 
   const handleEqualsClick = () => {
-    if (!previousInput || !operator) return;
     try {
-      const expression = `${previousInput} ${operator} ${currentInput}`;
       const evalResult = evaluate(expression);
       setResult(String(evalResult));
-      setCurrentInput(String(evalResult));
-      setPreviousInput(null);
-      setOperator(null);
+      setExpression(String(evalResult)); // allow chaining like real calculators
     } catch {
-      setCurrentInput('Error');
+      setResult('Error');
+      setExpression('');
     }
   };
 
   const handleClearClick = () => {
-    setCurrentInput('0');
-    setPreviousInput(null);
-    setOperator(null);
+    setExpression('');
     setResult('0');
   };
 
   const handleDecimalClick = () => {
-    if (!currentInput.includes('.')) {
-      setCurrentInput((prev) => prev + '.');
+    if (!expression.includes('.')) {
+      setExpression((prev) => prev + '.');
     }
   };
 
   const handlePercentageClick = () => {
-    setCurrentInput((prev) => String(parseFloat(prev) / 100));
+    try {
+      const evalResult = evaluate(expression + ' / 100');
+      setResult(String(evalResult));
+      setExpression(String(evalResult));
+    } catch {
+      setResult('Error');
+      setExpression('');
+    }
   };
 
+  const handleBackspaceClick = () => {
+    setExpression((prev) => prev.slice(0, -1));
+  };
+
+  // Add keyboard event listener
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      const key = event.key;
+
+      if (key >= '0' && key <= '9') {
+        handleNumberClick(key);
+      } else if (key === '.') {
+        handleDecimalClick();
+      } else if (key === '+') {
+        handleOperatorClick('+');
+      } else if (key === '-') {
+        handleOperatorClick('-');
+      } else if (key === '*') {
+        handleOperatorClick('*');
+      } else if (key === '/') {
+        handleOperatorClick('/');
+      } else if (key === '=' || key === 'Enter') {
+        handleEqualsClick();
+      } else if (key === 'Backspace') {
+        handleBackspaceClick();
+      } else if (key === 'Escape') {
+        handleClearClick();
+      }
+    };
+
+    // Listen to keyboard events
+    document.addEventListener('keydown', handleKeyPress);
+
+    // Cleanup the event listener when the component is unmounted
+    return () => {
+      document.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [expression]);
+
   return {
-    currentInput,
-    previousInput,
-    operator,
+    expression,
     result,
     handleNumberClick,
     handleOperatorClick,
@@ -63,7 +94,8 @@ const useCalculatorLogic = () => {
     handleClearClick,
     handleDecimalClick,
     handlePercentageClick,
-    setCurrentInput,
+    handleBackspaceClick, // Expose the new handler
+    setExpression,
   };
 };
 

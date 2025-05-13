@@ -6,6 +6,7 @@ import '../App.css';
 interface ScientificModeProps {
   currentInput: string;
   setCurrentInput: React.Dispatch<React.SetStateAction<string>>;
+  handleNumberClick: (value: string) => void;
   handleOperatorClick: (value: string) => void;
   handleEqualsClick: () => void;
 }
@@ -13,6 +14,7 @@ interface ScientificModeProps {
 const ScientificMode: React.FC<ScientificModeProps> = ({
   currentInput,
   setCurrentInput,
+  handleNumberClick,
   handleOperatorClick,
   handleEqualsClick,
 }) => {
@@ -40,30 +42,33 @@ const ScientificMode: React.FC<ScientificModeProps> = ({
         <Button value="1/x" onClick={() => setCurrentInput(String(1 / parseFloat(currentInput)))} />
       </div>
       <div className="row">
-        <Button value="π" onClick={() => setCurrentInput((prev) => prev + Math.PI)} />
-        <Button value="e" onClick={() => setCurrentInput((prev) => prev + Math.E)} />
+        <Button value="π" onClick={() => setCurrentInput((prev) => prev + Math.PI.toString())} />
+        <Button value="e" onClick={() => setCurrentInput((prev) => prev + Math.E.toString())} />
         <Button value="(" onClick={() => setCurrentInput((prev) => prev + '(')} />
         <Button value=")" onClick={() => setCurrentInput((prev) => prev + ')')} />
       </div>
       <div className="row">
-        {['7', '8', '9', '*'].map((val) => (
-          <Button key={val} value={val} onClick={handleOperatorClick} />
+        {['7', '8', '9'].map((val) => (
+          <Button key={val} value={val} onClick={handleNumberClick} />
         ))}
+        <Button value="*" onClick={handleOperatorClick} />
       </div>
       <div className="row">
-        {['4', '5', '6', '-'].map((val) => (
-          <Button key={val} value={val} onClick={handleOperatorClick} />
+        {['4', '5', '6'].map((val) => (
+          <Button key={val} value={val} onClick={handleNumberClick} />
         ))}
+        <Button value="-" onClick={handleOperatorClick} />
       </div>
       <div className="row">
-        {['1', '2', '3', '+'].map((val) => (
-          <Button key={val} value={val} onClick={handleOperatorClick} />
+        {['1', '2', '3'].map((val) => (
+          <Button key={val} value={val} onClick={handleNumberClick} />
         ))}
+        <Button value="+" onClick={handleOperatorClick} />
       </div>
       <div className="row">
-        <Button value="0" onClick={handleOperatorClick} className="zero" />
+        <Button value="0" onClick={handleNumberClick} className="zero" />
         <Button value="." onClick={() => setCurrentInput((prev) => prev + '.')} />
-        <Button value="=" onClick={() => handleEqualsClick()} className="equals" />
+        <Button value="=" onClick={handleEqualsClick} className="equals" />
       </div>
     </div>
   );
